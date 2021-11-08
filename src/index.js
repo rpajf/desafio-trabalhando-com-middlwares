@@ -9,21 +9,61 @@ app.use(cors());
 
 const users = [];
 
+
 function checksExistsUserAccount(request, response, next) {
-  // Complete aqui
+  // const {username} = request.body
+  const { username } = request.headers;
+  if(!username) return response.status(400).json({ error: 'username is required' });
+
+  const user = users.find((user) => user.username === username);
+  if (!user) {
+    return response.status(404).json({ error: "user does not exist" });
+  }
+  request.user = user;
+  return next();
 }
 
 function checksCreateTodosUserAvailability(request, response, next) {
-  // Complete aqui
+
+  const user = request.user
+  
+
+  if(user.todos.length === 10 && !user.pro){
+    return response.status(404).json({ error: "user has reached all todos" });
+  }
+  else{
+    return next()
+
+  }
+  
+
+
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+  const {id} = request.params
+  const todo = users.todo.find((todo) => todo.id ===id)
+  if(!todo){
+    return response.status(404).json({ error: "todo does not exist" });
+
+  }
+  return next()
+
 }
 
 function findUserById(request, response, next) {
-  // Complete aqui
+  const {id} = request.params
+  const user = users.find((user) => user.id === id);
+  if (!user) {
+    return response.status(404).json({ error: "user does not exist" });
+  }
+  request.user = user
+  return next()
 }
+app.get("/users", (request, response) => {
+  return response.json(users);
+});
+
 
 app.post('/users', (request, response) => {
   const { name, username } = request.body;
